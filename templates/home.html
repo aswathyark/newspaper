@@ -1,0 +1,171 @@
+{% load i18n %}
+{% get_current_language as lang %}
+
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>My Newspaper</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Merriweather&family=Open+Sans&display=swap" rel="stylesheet">
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Open Sans', sans-serif;
+    background: #fafafa;
+}
+
+/* HEADER */
+.header {
+    background: #222;
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h1 {
+    margin: 0;
+    font-family: 'Merriweather', serif;
+}
+
+/* LANGUAGE */
+.lang select {
+    padding: 6px;
+    border-radius: 5px;
+}
+
+/* HERO SECTION */
+.hero {
+    background: url('https://images.unsplash.com/photo-1504711434969-e33886168f5c');
+    background-size: cover;
+    color: white;
+    padding: 80px 30px;
+}
+
+.hero h2 {
+    font-size: 40px;
+}
+
+/* MAIN LAYOUT */
+.main {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* ARTICLES */
+.article {
+    background: white;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-left: 5px solid #007BFF;
+}
+
+.article h3 {
+    margin-top: 0;
+    font-family: 'Merriweather', serif;
+}
+
+/* SIDEBAR */
+.sidebar {
+    background: white;
+    padding: 15px;
+}
+
+.sidebar h3 {
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 5px;
+}
+
+/* FOOTER */
+.footer {
+    background: #222;
+    color: white;
+    text-align: center;
+    padding: 15px;
+}
+</style>
+
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <h1>📰 My Newspaper</h1>
+
+    <form action="{% url 'set_language' %}" method="post" class="lang">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.path }}">
+        <select name="language" onchange="this.form.submit()">
+            <option value="en" {% if lang == "en" %}selected{% endif %}>English</option>
+            <option value="hi" {% if lang == "hi" %}selected{% endif %}>Hindi</option>
+            <option value="fr" {% if lang == "fr" %}selected{% endif %}>French</option>
+        </select>
+    </form>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+    <h2>{% trans "Choose your preferred language and read comfortably" %}</h2>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+    <!-- ARTICLES -->
+    <div>
+        {% for article in articles %}
+        <div class="article">
+            <h3>
+                {% if lang == "hi" %}
+                    {{ article.title_hi }}
+                {% elif lang == "fr" %}
+                    {{ article.title_fr }}
+                {% else %}
+                    {{ article.title_en }}
+                {% endif %}
+            </h3>
+
+            <p>
+                {% if lang == "hi" %}
+                    {{ article.content_hi|truncatewords:30 }}
+                {% elif lang == "fr" %}
+                    {{ article.content_fr|truncatewords:30 }}
+                {% else %}
+                    {{ article.content_en|truncatewords:30 }}
+                {% endif %}
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h3>{% trans "Latest News" %}</h3>
+
+        {% for article in articles|slice:":5" %}
+            <p>
+                {% if lang == "hi" %}
+                    {{ article.title_hi }}
+                {% elif lang == "fr" %}
+                    {{ article.title_fr }}
+                {% else %}
+                    {{ article.title_en }}
+                {% endif %}
+            </p>
+        {% endfor %}
+    </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+    © 2026 My Newspaper | {% trans "Read news in your language" %}
+</div>
+
+</body>
+</html>
